@@ -10,5 +10,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    # Configure Java
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin' # Choix de la distribution Java
+          java-version: '17' # Version de Java (ajustez selon vos besoins)
+
+      # Installe Maven (ou Gradle selon votre build tool)
+      - name: Set up Maven
+        run: sudo apt-get install -y maven
+        
       - name: Run JUnit testAddition
         run: mvn test -Dtest=AppTest#testAddition
