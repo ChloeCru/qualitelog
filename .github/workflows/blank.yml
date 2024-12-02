@@ -3,23 +3,35 @@ name: Github Action Tests
 on:
   push:
     branches: [ "main" ]
-
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-    # Configure Java
+      # Étape 1 : Vérifier le code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Étape 2 : Configurer Java
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin' # Choix de la distribution Java
-          java-version: '17' # Version de Java (ajustez selon vos besoins)
+          distribution: 'temurin' # Distribution Java (choisissez temurin ou adoptium)
+          java-version: '17'      # Version Java (ajustez selon votre projet)
 
-      # Installe Maven (ou Gradle selon votre build tool)
-      - name: Set up Maven
-        run: sudo apt-get install -y maven
-        
-      - name: Run JUnit testAddition
-        run: mvn test -Dtest=AppTest#testAddition
+      # Étape 3 : Installer Maven
+      - name: Install Maven
+        run: sudo apt-get update && sudo apt-get install -y maven
+
+      # Étape 4 : Lancer les tests avec JaCoCo
+      - name: Run JUnit testAddition with JaCoCo
+        run: mvn clean test jacoco:report -Dtest=AppTest#testAddition
+
+      # Étape 5 : Sauvegarder le rapport de couverture dans les artefacts
+      - name: Upload JaCoCo coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: jacoco-report
+          path: target/site/jacoco
